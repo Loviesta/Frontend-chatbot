@@ -1,0 +1,7 @@
+@import "tailwindcss";
+@layer base {
+    input::-ms-reveal,
+    input::-ms-clear {
+        display: none !important;
+    }
+}
