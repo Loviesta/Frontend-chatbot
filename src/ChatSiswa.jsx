@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import axios from 'axios'; // Memastikan axios terimport untuk menembak API Laravel
-import ReactMarkdown from 'react-markdown'; // 🚀 Mengimport library pendukung Markdown
+import ReactMarkdown from 'react-markdown'; // Mengimport library pendukung Markdown
 
 export default function ChatSiswa({ user, onLogout, onUpdateAvatar }) {
   const [messages, setMessages] = useState([
@@ -11,20 +11,20 @@ export default function ChatSiswa({ user, onLogout, onUpdateAvatar }) {
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [isAiTyping, setIsAiTyping] = useState(false); // <-- State untuk animasi loading chat AI
   
-  // 💡 STATE ANTI-REFRESH: Mengambil kondisi awal langsung dari localStorage browser
+  // STATE ANTI-REFRESH: Mengambil kondisi awal langsung dari localStorage browser
   const [hasJoinedClass, setHasJoinedClass] = useState(() => localStorage.getItem('student_has_joined') === 'true'); 
   const [inputClassCode, setInputClassCode] = useState('');
   const [classError, setClassError] = useState('');
   const [activeClass, setActiveClass] = useState(() => localStorage.getItem('student_active_class') || ''); 
   const [classCode, setClassCode] = useState(() => localStorage.getItem('student_class_code') || ''); 
 
-  // 🍔 MULTI-SESI STATES
+  // MULTI-SESI STATES
   const [sessions, setSessions] = useState([]); // Menyimpan daftar sesi di sidebar
   const [currentSessionId, setCurrentSessionId] = useState(() => localStorage.getItem('student_current_session') || `session-${Date.now()}`); // Sesi aktif saat ini
 
   const chatEndRef = useRef(null);
 
-  // 🚪 DETEKTOR REALTIME KICK GURU (MENGECEK STATUS TIAP 5 DETIK)
+  // DETEKTOR REALTIME KICK GURU (MENGECEK STATUS TIAP 5 DETIK)
   useEffect(() => {
     // Jika siswa memang sedang berada di dalam ruang chat kelas, jalankan detektor
     if (hasJoinedClass) {
@@ -37,7 +37,7 @@ export default function ChatSiswa({ user, onLogout, onUpdateAvatar }) {
             headers: { Authorization: `Bearer ${token}` }
           });
 
-          // 💡 JIKA DI DATABASE MYSQL STATUS CLASS_CODE SUDAH BERUBAH JADI NULL (DI-KICK GURU)
+          // RESPON JIKA DI DATABASE MYSQL STATUS CLASS_CODE SUDAH BERUBAH JADI NULL (DI-KICK GURU)
           if (response.data.success && response.data.class_code === null) {
             alert('Akses kamu dicabut! Kamu telah dikeluarkan dari kelas oleh guru. 🔒');
             
@@ -65,7 +65,7 @@ export default function ChatSiswa({ user, onLogout, onUpdateAvatar }) {
     }
   }, [hasJoinedClass, user]);
 
-  // 🔄 PERBAIKAN EFFECT OTOMATIS: Mengunci status jika user sudah punya kelas dari database Laravel maupun localStorage
+  // Mengunci status jika user sudah punya kelas dari database Laravel maupun localStorage
   useEffect(() => {
     if (user?.class_code) {
       setHasJoinedClass(true);
@@ -82,21 +82,21 @@ export default function ChatSiswa({ user, onLogout, onUpdateAvatar }) {
     }
   }, [user]);
 
-  // ✨ PERBAIKAN SCROLL: Hanya scroll ke bawah saat siswa kirim chat baru
+  // Fungsi Hanya scroll ke bawah saat siswa kirim chat baru
   useEffect(() => {
     if (messages.length > 0 && !messages[messages.length - 1].isAi) {
       chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
     }
   }, [messages]);
 
-  // ✨ PERBAIKAN SCROLL: Fokuskan layar ke bawah tepat di AWAL AI mulai merespon agar posisinya pas
+  // Fokuskan layar ke bawah tepat di AWAL AI mulai merespon agar posisinya pas
   useEffect(() => {
     if (isAiTyping) {
       chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
     }
   }, [isAiTyping]);
 
-  // 📥 MULTI-SESI: Ambil daftar sesi unik dari backend saat berhasil masuk kelas
+  // Ambil daftar sesi unik dari backend saat berhasil masuk kelas
   const fetchStudentSessions = async (targetClassCode) => {
     const token = localStorage.getItem('auth_token') || user?.token;
     try {
@@ -112,7 +112,7 @@ export default function ChatSiswa({ user, onLogout, onUpdateAvatar }) {
     }
   };
 
-  // 📝 MULTI-SESI: Simpan log percakapan siswa & AI ke database analitik guru
+  // Simpan log percakapan siswa & AI ke database analitik guru
   const saveChatToTeacherAnalytics = async (userMsg, aiMsg) => {
     const token = localStorage.getItem('auth_token') || user?.token;
     const currentCode = localStorage.getItem('student_class_code') || classCode;
@@ -134,7 +134,7 @@ export default function ChatSiswa({ user, onLogout, onUpdateAvatar }) {
     }
   };
 
-  // 🔄 MULTI-SESI: Muat ulang riwayat pesan lama saat salah satu judul sesi di sidebar diklik
+  // Muat ulang riwayat pesan lama saat salah satu judul sesi di sidebar diklik
   const handleSelectSession = async (sessionId) => {
     const token = localStorage.getItem('auth_token') || user?.token;
     setIsSidebarOpen(false); // Tutup sidebar di tampilan HP
@@ -165,7 +165,7 @@ export default function ChatSiswa({ user, onLogout, onUpdateAvatar }) {
     }
   };
 
-  // ➕ MULTI-SESI: Fungsi tombol membuat obrolan baru (+ Chat Baru)
+  // Fungsi tombol membuat obrolan baru (+ Chat Baru)
   const handleNewChat = () => {
     const newSessionId = `session-${Date.now()}`;
     setCurrentSessionId(newSessionId);
@@ -176,7 +176,7 @@ export default function ChatSiswa({ user, onLogout, onUpdateAvatar }) {
     setIsSidebarOpen(false);
   };
 
-  // 🚀 FUNGSI KIRIM PESAN NYATA KE GEMINI AI (Lewat Laravel) + EFEK TYPEWRITER
+  // FUNGSI KIRIM PESAN KE GEMINI AI (Lewat Laravel) + EFEK TYPEWRITER
   const handleSendMessage = async (e) => {
     e.preventDefault();
     if (!inputText.trim() || isAiTyping) return;
@@ -201,7 +201,7 @@ export default function ChatSiswa({ user, onLogout, onUpdateAvatar }) {
         'http://127.0.0.1:8000/api/chat',
         { 
           message: currentInput,
-          active_class: currentClassName // 👈 SUNTIKKAN INI AGAR LARAVEL TAHU MAPELNYA!
+          active_class: currentClassName // INI AGAR LARAVEL TAHU MAPELNYA!
         },
         {
           headers: {
@@ -216,7 +216,7 @@ export default function ChatSiswa({ user, onLogout, onUpdateAvatar }) {
 
         const fullReply = response.data.reply;
         
-        // 🌟 LOGIKA UTAMA: EFEK TYPEWRITER (KATA PER KATA)
+        // EFEK TYPEWRITER (KATA PER KATA)
         const words = fullReply.split(' '); 
         let currentWordIndex = 0;
         let displayedText = '';
@@ -245,7 +245,7 @@ export default function ChatSiswa({ user, onLogout, onUpdateAvatar }) {
             // Bersihkan timer jika seluruh kata sudah dimunculkan semua
             clearInterval(typingInterval);
             
-            // 📊 AUTOMATION BACKEND: Simpan obrolan ke database ketika efek mengetik selesai sempurna!
+            // Simpan obrolan ke database ketika efek mengetik selesai sempurna!
             saveChatToTeacherAnalytics(currentInput, fullReply);
           }
         }, 40);
@@ -254,7 +254,7 @@ export default function ChatSiswa({ user, onLogout, onUpdateAvatar }) {
       console.error(error);
       setIsAiTyping(false);
 
-      // 💡 PERBAIKAN REALTIME KICK: Jika status kelas ilegal / tidak ditemukan lagi di database akibat di-kick guru
+      // fungsi status kelas ilegal / tidak ditemukan lagi di database akibat di-kick guru
       if (error.response && (error.response.status === 403 || error.response.status === 404)) {
         setHasJoinedClass(false);
         localStorage.removeItem('student_has_joined');
@@ -273,7 +273,7 @@ export default function ChatSiswa({ user, onLogout, onUpdateAvatar }) {
     }
   };
 
-  // FUNGSI VALIDASI KODE KELAS NYATA (Terhubung ke Database MySQL lewat Laravel)
+  // FUNGSI VALIDASI KODE KELAS 
   const handleJoinClass = async (e) => {
     e.preventDefault();
     const formattedCode = inputClassCode.trim();
@@ -304,7 +304,7 @@ export default function ChatSiswa({ user, onLogout, onUpdateAvatar }) {
         setHasJoinedClass(true); 
         setClassError('');
         
-        // 💡 Amankan semua status pendaftaran siswa ke localStorage biar anti-refresh
+        // Amankan semua status pendaftaran siswa ke localStorage biar anti-refresh
         localStorage.setItem('student_has_joined', 'true');
         localStorage.setItem('student_class_code', formattedCode);
         localStorage.setItem('student_active_class', response.data.class_name);
@@ -330,7 +330,7 @@ export default function ChatSiswa({ user, onLogout, onUpdateAvatar }) {
     }
   };
 
-  // 💡 FUNGSI LOGOUT INTEGRATED: Membersihkan semua jejak session siswa di komputer
+  // FUNGSI LOGOUT INTEGRATED: Membersihkan semua jejak session siswa di komputer
   const handleStudentLogout = () => {
     localStorage.removeItem('student_has_joined');
     localStorage.removeItem('student_class_code');
@@ -339,7 +339,7 @@ export default function ChatSiswa({ user, onLogout, onUpdateAvatar }) {
     onLogout();
   };
 
-  // Helper untuk memformat URL avatar agar aman dari double domain / missing domain
+  // bantuan untuk memformat URL avatar agar aman dari double domain / missing domain
   const getAvatarUrl = (avatarPath) => {
     if (!avatarPath) return `https://api.dicebear.com/7.x/bottts/svg?seed=${user?.email || 'default'}`;
     if (avatarPath.startsWith('http://') || avatarPath.startsWith('https://')) {
@@ -507,7 +507,7 @@ export default function ChatSiswa({ user, onLogout, onUpdateAvatar }) {
                     </div>
                   </label>
                   
-                  {/* KODE BARU UPLOAD AVATAR (PERMANEN) */}
+                  {/* KODE UPLOAD AVATAR (PERMANEN) */}
                   <input 
                     type="file" 
                     id="upload-avatar-siswa" 
@@ -580,7 +580,7 @@ export default function ChatSiswa({ user, onLogout, onUpdateAvatar }) {
             </div>
           ))}
 
-          {/* 💬 INDIKATOR LOADING CHAT AI */}
+          {/* INDIKATOR LOADING CHAT AI */}
           {isAiTyping && (
             <div className="flex justify-start animate-pulse">
               <div className="bg-slate-100 text-slate-500 max-w-[80%] px-5 py-3 rounded-2xl rounded-tl-none text-sm italic flex items-center gap-2">

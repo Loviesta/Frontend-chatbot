@@ -11,7 +11,7 @@ export default function Login({ onLogin, setIsRegistering }) {
     e.preventDefault();
     
     try {
-      // 🚀 Tembak API Login Laravel
+      // Tembak API Login Laravel
       const response = await axios.post('http://127.0.0.1:8000/api/login', {
         email: email,
         password: password

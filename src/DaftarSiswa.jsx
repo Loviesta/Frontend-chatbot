@@ -30,7 +30,7 @@ export default function DaftarSiswa({ setIsRegistering, onLogin }) {
       });
 
       if (response.data.success) {
-        // Pop-up alert bawaan browser sudah dihapus agar alur perpindahan halaman langsung instan
+        
         onLogin(response.data.user); // Otomatis masuk akun sesuai role
       }
     } catch (error) {

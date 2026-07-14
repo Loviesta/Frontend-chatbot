@@ -10,14 +10,14 @@ export default function DashboardGuru({
   const [activeTab, setActiveTab] = useState('minggu-ini');
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   
-  // 💡 STATE MANAJEMEN KELAS (Sekarang mengambil nilai awal dari localStorage agar anti-refresh)
+  // STATE MANAJEMEN KELAS 
   const [classCode, setClassCode] = useState(() => localStorage.getItem('teacher_class_code') || ''); 
   const [className, setClassName] = useState(''); 
   const [isClassLocked, setIsClassLocked] = useState(() => localStorage.getItem('teacher_class_locked') === 'true');
   const [copiedText, setCopiedText] = useState('Salin Link');
   const [isLoading, setIsLoading] = useState(false); 
   
-  // STATE MODAL DAFTAR SISWA & DATA SISWA REAL DARI DATABASE
+  // STATE MODAL DAFTAR SISWA & DATA SISWA DARI DATABASE
   const [isStudentModalOpen, setIsStudentModalOpen] = useState(false);
   const [students, setStudents] = useState([]);
 
@@ -29,18 +29,18 @@ export default function DashboardGuru({
   const [chatHistory, setChatHistory] = useState([]);
   const [isLoadingChats, setIsLoadingChats] = useState(false);
   
-  // STATE BARU: Menyimpan siswa yang sedang dipilih di dalam modal chat
+  // Menyimpan siswa yang sedang dipilih di dalam modal chat
   const [selectedStudentChat, setSelectedStudentChat] = useState(null);
 
-  // 🧠 STATE BARU: Menyimpan hasil analisis topik terpopuler dari Gemini API Backend
+  // Menyimpan hasil analisis topik terpopuler dari Gemini API Backend
   const [analyzedTopics, setAnalyzedTopics] = useState([]);
 
   const totalSiswa = students.length;
   const siswaOnline = students.filter(s => s.last_seen || s.isOnline).length;
 
-  // ====================================================================
-  // HELPER: MENGAMBIL TOKEN DARI LOCALSTORAGE / USER STATE
-  // ====================================================================
+  
+  // MENGAMBIL TOKEN DARI LOCALSTORAGE / USER STATE
+  
   const getAuthConfig = () => {
     const token = localStorage.getItem('auth_token') || user?.token;
     return {
@@ -50,7 +50,7 @@ export default function DashboardGuru({
     };
   };
 
-  // Helper untuk memformat URL avatar agar aman dari double domain / missing domain
+  // untuk memformat URL avatar agar aman dari double domain / missing domain
   const getAvatarUrl = (avatarPath) => {
     if (!avatarPath) return `https://api.dicebear.com/7.x/initials/svg?seed=${user?.email || 'Guru'}`;
     if (avatarPath.startsWith('http://') || avatarPath.startsWith('https://')) {
@@ -59,9 +59,9 @@ export default function DashboardGuru({
     return `http://127.0.0.1:8000${avatarPath.startsWith('/') ? '' : '/'}${avatarPath}`;
   };
 
-  // ====================================================================
-  // EFFECT: CEK APAKAH GURU SUDAH MEMILIKI KELAS AKTIF DI DATABASE
-  // ====================================================================
+  
+  // CEK APAKAH GURU SUDAH MEMILIKI KELAS AKTIF DI DATABASE
+  
   useEffect(() => {
     if (!user?.email) return;
 
@@ -80,7 +80,7 @@ export default function DashboardGuru({
           setClassCode(fetchedCode);
           setIsClassLocked(fetchedLock);
           
-          // 💡 Simpan ke localStorage agar awet saat di-refresh
+          // untuk Simpan ke localStorage agar awet saat di-refresh
           localStorage.setItem('teacher_class_code', fetchedCode);
           localStorage.setItem('teacher_class_locked', fetchedLock);
         }
@@ -92,9 +92,9 @@ export default function DashboardGuru({
     checkActiveClass();
   }, [user]);
 
-  // ====================================================================
-  // EFFECT: SINKRONISASI OTOMATIS DATA SISWA DARI LARAVEL BACKEND
-  // ====================================================================
+  
+  // SINKRONISASI OTOMATIS DATA SISWA DARI LARAVEL BACKEND
+  
   useEffect(() => {
     if (!classCode) return;
 
@@ -117,9 +117,9 @@ export default function DashboardGuru({
     return () => clearInterval(interval);
   }, [classCode]);
 
-  // ====================================================================
-  // EFFECT: SINKRONISASI OTOMATIS RIWAYAT CHAT DARI LARAVEL
-  // ====================================================================
+  
+  // SINKRONISASI OTOMATIS RIWAYAT CHAT DARI LARAVEL
+  
   useEffect(() => {
     if (!classCode || !isChatModalOpen) return;
 
@@ -145,9 +145,9 @@ export default function DashboardGuru({
     return () => clearInterval(chatInterval);
   }, [classCode, isChatModalOpen]);
 
-  // ====================================================================
-  // 🧠 EFFECT BARU: SINKRONISASI TOPIK TERANALISIS UNTUK BOX OVERVIEW GURU
-  // ====================================================================
+  
+  // SINKRONISASI TOPIK TERANALISIS UNTUK BOX OVERVIEW GURU
+  
   useEffect(() => {
     if (!classCode) return;
 
@@ -170,9 +170,9 @@ export default function DashboardGuru({
     return () => clearInterval(analysisInterval);
   }, [classCode, activeTab]); // Akan ter-trigger ulang saat ganti tab atau ganti kelas
 
-  // ====================================================================
-  // FITUR 1: LOGIKA KUNCI / BUKA PENDAFTARAN KELAS (PATCH LARAVEL)
-  // ====================================================================
+  
+  // LOGIKA KUNCI / BUKA PENDAFTARAN KELAS (PATCH LARAVEL)
+  
   const handleToggleClassLock = async () => {
     if (!classCode) return alert('Buat ruang kelas terlebih dahulu!');
     
@@ -194,9 +194,9 @@ export default function DashboardGuru({
     }
   };
 
-  // ====================================================================
+  
   // FITUR 2: LOGIKA KICK SISWA PERMANEN DARI DATABASE (DELETE LARAVEL)
-  // ====================================================================
+  
   const handleKickStudent = (id, name) => {
     setSelectedStudentToKick({ id, name });
     setIsKickModalOpen(true);
@@ -222,9 +222,9 @@ export default function DashboardGuru({
     }
   };
 
-  // ====================================================================
+  
   // LOGIKA KIRIM DAN BUAT RUANG KELAS BARU KE LARAVEL BACKEND
-  // ====================================================================
+  
   const handleCreateClass = async (e) => {
     e.preventDefault();
     if (!className.trim()) return alert('Nama kelas wajib diisi!');
@@ -260,9 +260,9 @@ export default function DashboardGuru({
     }
   };
 
-  // ====================================================================
-  // FITUR 4: LOGIKA UPLOAD AVATAR GURU PERMANEN
-  // ====================================================================
+  
+  // LOGIKA UPLOAD AVATAR GURU PERMANEN
+  
   const handleAvatarChange = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
@@ -293,9 +293,9 @@ export default function DashboardGuru({
     }
   };
 
-  // ====================================================================
-  // FITUR 3: SALIN LINK AKSES DINAMIS BERDASARKAN ALAMAT RUNNING
-  // ====================================================================
+  
+  // SALIN LINK AKSES DINAMIS BERDASARKAN ALAMAT RUNNING
+  
   const handleCopyLink = () => {
     if (!classCode) return;
     const inviteLink = `${window.location.origin}/join/${classCode}`;
@@ -317,7 +317,7 @@ export default function DashboardGuru({
   return (
     <div className="min-h-screen w-full bg-gradient-to-b from-[#fcbfe8] to-white p-4 md:p-8 font-sans select-none flex items-center justify-center relative">
       
-      {/* MODAL POPUP: PROFIL / DAFTAR SISWA KELAS */}
+      {/* POPUP PROFIL / DAFTAR SISWA KELAS */}
       {isStudentModalOpen && (
         <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-md z-[99] flex items-center justify-center p-4 animate-fadeIn">
           <div className="w-full max-w-md bg-white rounded-[32px] shadow-2xl border border-purple-100 p-6 flex flex-col max-h-[85vh]">
@@ -368,7 +368,7 @@ export default function DashboardGuru({
         </div>
       )}
 
-      {/* MODAL POPUP: RIWAYAT CHAT SISWA */}
+      {/* POPUP RIWAYAT CHAT SISWA */}
       {isChatModalOpen && (
         <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-md z-[99] flex items-center justify-center p-4 animate-fadeIn">
           <div className="w-full max-w-lg bg-white rounded-[32px] shadow-2xl border border-purple-100 p-6 flex flex-col max-h-[85vh]">
@@ -539,7 +539,7 @@ export default function DashboardGuru({
 
               <button 
                 onClick={() => {
-                  // 💡 Bersihkan localStorage khusus kelas guru saat logout
+                  // Bersihkan localStorage khusus kelas guru saat logout
                   localStorage.removeItem('teacher_class_code');
                   localStorage.removeItem('teacher_class_locked');
                   onLogout();
@@ -616,7 +616,7 @@ export default function DashboardGuru({
                     setStudents([]);
                     setIsClassLocked(false);
                     setAnalyzedTopics([]);
-                    // 💡 Hapus data kelas dari localStorage saat kelas ditutup resmi
+                    // Hapus data kelas dari localStorage saat kelas ditutup resmi
                     localStorage.removeItem('teacher_class_code');
                     localStorage.removeItem('teacher_class_locked');
                   }
@@ -654,7 +654,7 @@ export default function DashboardGuru({
           <div className="w-full min-h-[300px] bg-gradient-to-b from-[#fca0ff] to-[#fecfff] rounded-[28px] shadow-[0_12px_35px_rgba(243,167,255,0.3)] p-5 border border-white/40 flex flex-col">
             <p className="text-xs font-bold text-purple-950/80 mb-3 tracking-wide">🔥 Topik Analisis Chat Paling Sering Ditanyakan:</p>
             <div className="space-y-2.5 flex-1 overflow-y-auto pr-1">
-              {/* 💡 SEKARANG RENDER DATA HASIL ANALISIS REAL DARI GEMINI BACKEND */}
+              {/* RENDER DATA HASIL ANALISIS DARI GEMINI BACKEND */}
               {analyzedTopics && analyzedTopics.length > 0 ? (
                 analyzedTopics.map((item, idx) => (
                   <div key={idx} className="bg-white/40 hover:bg-white/60 transition-all p-3 rounded-2xl border border-white/30 flex items-center justify-between gap-3 shadow-[0_2px_8px_rgba(0,0,0,0.01)] animate-fadeIn">
@@ -677,7 +677,7 @@ export default function DashboardGuru({
 
       </div>
 
-      {/* POP-UP MODAL KICK */}
+      {/* POP-UP KICK */}
       {isKickModalOpen && selectedStudentToKick && (
         <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-[100] flex items-center justify-center p-4 animate-fadeIn">
           <div className="w-full max-w-sm bg-white rounded-[2.5rem] p-6 text-center shadow-[0_25px_60px_-10px_rgba(0,0,0,0.3)] border border-purple-50">

@@ -9,7 +9,7 @@ function App() {
   const [isRegistering, setIsRegistering] = useState(false);
   const [isLoading, setIsLoading] = useState(true); 
 
-  // 💡 SEBELUM HALAMAN DI-RENDER, CEK LOCALSTORAGE APAKAH USER SUDAH LOGIN
+  // SEBELUM HALAMAN DI-RENDER, CEK LOCALSTORAGE APAKAH USER SUDAH LOGIN
   useEffect(() => {
     const savedToken = localStorage.getItem('auth_token');
     const savedUser = localStorage.getItem('auth_user');
@@ -29,10 +29,10 @@ function App() {
     setIsLoading(false); 
   }, []);
 
-  // 💡 SINKRONISASI OTOMATIS: Menyimpan token, user data, dan data kelas saat berhasil login
+  // SINKRONISASI OTOMATIS: Menyimpan token, user data, dan data kelas saat berhasil login
   const handleLogin = (userData) => {
     const profileData = userData.user ? {...userData.user, token:userData.token} : userData;
-    // 🔒 MENGUNCI DATA UTAMA: Langsung amankan token dan data user ke storage browser agar tidak hilang saat di-refresh
+    // MENGUNCI DATA UTAMA: Langsung amankan token dan data user ke storage browser agar tidak hilang saat di-refresh
     localStorage.setItem('auth_token', profileData.token || localStorage.getItem('auth_token'));
     localStorage.setItem('auth_user', JSON.stringify(profileData));
 
@@ -50,7 +50,7 @@ function App() {
     setUser(profileData);
   };
 
-  // 💡 STATE UPDATE: Memperbarui data avatar di state utama dan localStorage secara sinkron
+  // Memperbarui data avatar di state utama dan localStorage secara sinkron
   const handleUpdateAvatar = (newAvatarUrl) => {
     setUser(prevUser => {
       if (!prevUser) return null;
@@ -60,7 +60,7 @@ function App() {
     });
   };
 
-  // 💡 PERBAIKAN: Bersihkan semua data tanpa sisa saat logout
+  // Bersihkan semua data tanpa sisa saat logout
   const handleLogout = () => {
     localStorage.removeItem('auth_token');
     localStorage.removeItem('auth_user');
